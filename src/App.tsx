@@ -242,10 +242,7 @@ export default function App() {
   const canvasH = svgInfo?.height ?? 600;
 
   return (
-    <div
-      className="flex flex-col h-screen bg-surface-900 text-gray-200 overflow-hidden"
-      onPointerDownCapture={unlockAudioFromUserGesture}
-    >
+    <div className="flex flex-col h-screen bg-surface-900 text-gray-200 overflow-hidden">
       {/* Top bar */}
       <header className="flex items-center justify-between px-5 py-3 border-b border-surface-700 flex-shrink-0 bg-surface-800">
         <div className="flex items-center gap-2.5">

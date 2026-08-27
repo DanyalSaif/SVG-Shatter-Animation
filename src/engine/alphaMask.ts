@@ -80,6 +80,35 @@ export function hasVisiblePixels(mask: Uint8Array): boolean {
   return mask.some(value => value !== 0);
 }
 
+/** Return whether a source-space point lands on an occupied alpha-mask pixel. */
+export function isVisibleSourcePoint(
+  point: { x: number; y: number },
+  mask: Uint8Array,
+  maskWidth: number,
+  maskHeight: number,
+  svgWidth: number,
+  svgHeight: number,
+): boolean {
+  if (
+    !Number.isFinite(point.x) ||
+    !Number.isFinite(point.y) ||
+    maskWidth <= 0 ||
+    maskHeight <= 0 ||
+    svgWidth <= 0 ||
+    svgHeight <= 0 ||
+    point.x < 0 ||
+    point.y < 0 ||
+    point.x > svgWidth ||
+    point.y > svgHeight
+  ) {
+    return false;
+  }
+
+  const x = Math.min(maskWidth - 1, Math.floor(point.x / svgWidth * maskWidth));
+  const y = Math.min(maskHeight - 1, Math.floor(point.y / svgHeight * maskHeight));
+  return mask[y * maskWidth + x] !== 0;
+}
+
 /** Clamps to source bounds and moves transparent impact points to the nearest occupied mask pixel. */
 export function resolveVisibleImpactPoint(
   point: { x: number; y: number },

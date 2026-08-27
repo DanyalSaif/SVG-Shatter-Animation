@@ -6,7 +6,7 @@ import { createCentralSmokePuffs, selectShardSmokeIds, updateSmoke } from '../sr
 import { createWhisp, selectWhispAnchorIds, updateWhisps } from '../src/engine/whispEngine';
 import { spawnExtinctionMotes, spawnParticles, spawnStylizedImpactParticles } from '../src/engine/particleEngine';
 import { resolveObjectWeightClass } from '../src/engine/soundEngine';
-import { resolveVisibleImpactPoint } from '../src/engine/alphaMask';
+import { isVisibleSourcePoint, resolveVisibleImpactPoint } from '../src/engine/alphaMask';
 import { getSourceRasterScale } from '../src/runtime/renderLimits';
 import {
   getDefaultGlobalConfig,
@@ -154,6 +154,18 @@ const ringMask = new Uint8Array(25);
 ringMask[0] = ringMask[4] = ringMask[20] = ringMask[24] = 1;
 const safeImpact = resolveVisibleImpactPoint({ x: Number.NaN, y: 500 }, ringMask, 5, 5, 100, 100);
 assert.ok(Number.isFinite(safeImpact.x) && Number.isFinite(safeImpact.y));
+
+const hollowMask = new Uint8Array(7 * 7);
+for (let y = 1; y <= 5; y++) for (let x = 1; x <= 5; x++) {
+  if (x === 1 || x === 5 || y === 1 || y === 5) hollowMask[y * 7 + x] = 1;
+}
+assert.equal(isVisibleSourcePoint({ x: 15, y: 15 }, hollowMask, 7, 7, 70, 70), true, 'solid source pixels must hit');
+assert.equal(isVisibleSourcePoint({ x: 35, y: 35 }, hollowMask, 7, 7, 70, 70), false, 'transparent holes must miss');
+assert.equal(isVisibleSourcePoint({ x: 9.9, y: 15 }, hollowMask, 7, 7, 70, 70), false, 'points beside the visible edge must miss');
+assert.equal(isVisibleSourcePoint({ x: 10, y: 15 }, hollowMask, 7, 7, 70, 70), true, 'visible edge pixels must hit');
+assert.equal(isVisibleSourcePoint({ x: -0.01, y: 15 }, hollowMask, 7, 7, 70, 70), false, 'points outside source bounds must miss');
+assert.equal(isVisibleSourcePoint({ x: 150, y: 15 }, hollowMask, 7, 7, 210, 70), true, 'wide source mapping must preserve occupancy');
+assert.equal(isVisibleSourcePoint({ x: 15, y: 150 }, hollowMask, 7, 7, 70, 210), true, 'tall source mapping must preserve occupancy');
 assert.ok(getSourceRasterScale(100_000, 100_000) > 0 && getSourceRasterScale(100_000, 100_000) <= 2);
 
 console.log('determinism assertions passed');

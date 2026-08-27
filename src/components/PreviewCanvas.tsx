@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import { ShatterEngine } from '../engine/shatterEngine';
 import { SVGInfo, ShatterConfig, GenerationStatus, PlaybackState, Point, ShatterFragment } from '../types/shatter';
 import { GenerationProgress } from './GenerationProgress';
@@ -50,6 +50,7 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<ShatterEngine | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isPointerOverVisible, setIsPointerOverVisible] = useState(false);
   const choosingImpact = config.impactMode === 'choose';
 
   // Init / destroy engine
@@ -143,21 +144,35 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 
   // Click / tap on canvas → play or choose impact
   const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    unlockAudioFromUserGesture();
     const engine = engineRef.current;
-    if (!engine) return;
+    if (!engine || generationStatus !== 'ready' || playbackState === 'playing') return;
 
-    const impactPoint = engine.canvasToSVG(e.clientX, e.clientY);
+    const impactPoint = engine.hitTestVisibleSource(e.clientX, e.clientY);
+    if (!impactPoint) return;
+
+    unlockAudioFromUserGesture();
+    setIsPointerOverVisible(false);
     onImpactPointChange?.(impactPoint);
 
-    if (generationStatus === 'ready' && playbackState !== 'playing') {
-      if (onImpactRebuild) void onImpactRebuild(impactPoint);
-      else engine.play(impactPoint);
-    }
+    if (onImpactRebuild) void onImpactRebuild(impactPoint);
+    else engine.play(impactPoint);
   }, [generationStatus, playbackState, onImpactPointChange, onImpactRebuild]);
 
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (generationStatus !== 'ready' || playbackState === 'playing') return;
+    if (engineRef.current?.hitTestVisibleSource(e.clientX, e.clientY)) {
+      unlockAudioFromUserGesture();
+    }
+  }, [generationStatus, playbackState]);
+
+  const handleCanvasPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canShatter = generationStatus === 'ready' && playbackState !== 'playing';
+    setIsPointerOverVisible(
+      canShatter && !!engineRef.current?.hitTestVisibleSource(e.clientX, e.clientY),
+    );
+  }, [generationStatus, playbackState]);
+
   const isGenerating = !['idle', 'ready'].includes(generationStatus);
-  const showChooseCursor = choosingImpact && generationStatus === 'idle' && !!svgInfo;
 
   return (
     <div
@@ -184,15 +199,11 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        onPointerDown={unlockAudioFromUserGesture}
+        onPointerDown={handleCanvasPointerDown}
+        onPointerMove={handleCanvasPointerMove}
+        onPointerLeave={() => setIsPointerOverVisible(false)}
         onClick={handleCanvasClick}
-        className={`w-full h-full ${
-          generationStatus === 'ready'
-            ? 'cursor-crosshair'
-            : showChooseCursor
-            ? 'cursor-crosshair'
-            : 'cursor-default'
-        }`}
+        className={`w-full h-full ${isPointerOverVisible ? 'cursor-pointer' : 'cursor-default'}`}
         aria-label="SVG Shatter preview canvas"
       />
 

@@ -1,5 +1,12 @@
 import { ShatterConfig, ShatterFragment, SVGInfo, Point, GenerationStatus, PlaybackState } from '../types/shatter';
-import { rasterizeSVG, buildAlphaMask, getVisibleBounds, hasVisiblePixels, resolveVisibleImpactPoint } from './alphaMask';
+import {
+  rasterizeSVG,
+  buildAlphaMask,
+  getVisibleBounds,
+  hasVisiblePixels,
+  isVisibleSourcePoint,
+  resolveVisibleImpactPoint,
+} from './alphaMask';
 import { createRandomSeed, generateFracture } from './fractureGenerator';
 import { buildFragments } from './fragmentBuilder';
 import { ShatterRuntime } from '../runtime/ShatterRuntime';
@@ -131,14 +138,16 @@ export class ShatterEngine {
         y: (bounds.y + bounds.h / 2) * svgH,
       };
     }
-    impact = resolveVisibleImpactPoint(
-      impact,
-      this.mask,
-      this.maskWidth,
-      this.maskHeight,
-      svgW,
-      svgH,
-    );
+    if (!isVisibleSourcePoint(impact, this.mask, this.maskWidth, this.maskHeight, svgW, svgH)) {
+      impact = resolveVisibleImpactPoint(
+        impact,
+        this.mask,
+        this.maskWidth,
+        this.maskHeight,
+        svgW,
+        svgH,
+      );
+    }
 
     // Generate fracture
     this.onStatusChange?.('fracturing');
@@ -243,6 +252,20 @@ export class ShatterEngine {
   canvasToSVG(clientX: number, clientY: number): Point {
     if (!this.runtime) return { x: 0, y: 0 };
     return this.runtime.canvasToSourceSpace(clientX, clientY);
+  }
+
+  /** Map a client point through the active stage transform and reject transparent source pixels. */
+  hitTestVisibleSource(clientX: number, clientY: number): Point | null {
+    if (!this.runtime || !this.svgInfo || !this.mask) return null;
+    const point = this.runtime.canvasToSourceSpace(clientX, clientY);
+    return isVisibleSourcePoint(
+      point,
+      this.mask,
+      this.maskWidth,
+      this.maskHeight,
+      this.svgInfo.width,
+      this.svgInfo.height,
+    ) ? point : null;
   }
 
   getFragments(): ShatterFragment[] { return this.runtime?.fragments || []; }
