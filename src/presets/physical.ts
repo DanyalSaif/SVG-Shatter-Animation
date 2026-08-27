@@ -1,0 +1,63 @@
+import { DEFAULT_CONFIG } from '../types/shatter';
+import type { DestructionStylePreset, PhysicalStyleConfig } from '../types/destructionStyle';
+
+export const PHYSICAL_STYLE_CONFIG: PhysicalStyleConfig = {
+  kind: 'physical',
+  fragmentCount: DEFAULT_CONFIG.fragmentCount,
+  breakStrength: DEFAULT_CONFIG.breakStrength,
+  gravity: DEFAULT_CONFIG.gravity,
+  bounce: DEFAULT_CONFIG.bounce,
+  rotation: DEFAULT_CONFIG.rotation,
+  particles: DEFAULT_CONFIG.particles,
+  screenShake: DEFAULT_CONFIG.screenShake,
+  airFriction: DEFAULT_CONFIG.airFriction,
+  fragmentFriction: DEFAULT_CONFIG.fragmentFriction,
+  impactRadius: DEFAULT_CONFIG.impactRadius,
+  forceVariation: DEFAULT_CONFIG.forceVariation,
+  rotationVariation: DEFAULT_CONFIG.rotationVariation,
+  floorEnabled: DEFAULT_CONFIG.floorEnabled,
+  floorY: DEFAULT_CONFIG.floorY,
+  particleLifetime: DEFAULT_CONFIG.particleLifetime,
+  animationDuration: DEFAULT_CONFIG.animationDuration,
+};
+
+export const PHYSICAL_PRESET: DestructionStylePreset = {
+  id: 'physical',
+  name: 'Physical Shatter',
+  description: 'Natural ceramic-style physics with falling and bouncing pieces.',
+  defaultGlobalConfig: {
+    background: DEFAULT_CONFIG.background,
+    sound: DEFAULT_CONFIG.sound,
+    soundSource: DEFAULT_CONFIG.soundSource,
+    customSoundVolume: DEFAULT_CONFIG.customSoundVolume,
+    impactMode: DEFAULT_CONFIG.impactMode,
+    seed: DEFAULT_CONFIG.seed,
+    exportFps: DEFAULT_CONFIG.exportFps,
+  },
+  defaultStyleConfig: PHYSICAL_STYLE_CONFIG,
+  defaultEngineConfig: DEFAULT_CONFIG,
+  timeline: {
+    strikeStart: 0,
+    compressionEnd: 50,
+    shakeStart: 50,
+    impact: 90,
+    fracture: 120,
+    motionStart: 120,
+    extinctionStart: DEFAULT_CONFIG.animationDuration,
+    cleanupStart: DEFAULT_CONFIG.animationDuration,
+    complete: DEFAULT_CONFIG.animationDuration,
+  },
+  fractureProfile: { kind: 'physical' },
+  motionProfile: { kind: 'physical' },
+  extinctionProfile: { kind: 'none' },
+  smokeProfile: { kind: 'none' },
+  audioProfile: { kind: 'physical' },
+  defaultVisualStyle: 'stylized',
+  capabilities: {
+    physicalSettings: true,
+    strikeSettings: false,
+    extinctionSettings: false,
+    whispSettings: false,
+    sizeAwareAudio: false,
+  },
+};

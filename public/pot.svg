@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Pot body -->
+  <ellipse cx="200" cy="340" rx="130" ry="30" fill="#8B2500" opacity="0.4"/>
+  <!-- Main body -->
+  <path d="M 100 320 Q 80 280 90 220 Q 100 160 120 130 Q 140 100 200 95 Q 260 100 280 130 Q 300 160 310 220 Q 320 280 300 320 Q 260 350 200 355 Q 140 350 100 320 Z" fill="#C1440E"/>
+  <!-- Shading -->
+  <path d="M 200 95 Q 260 100 280 130 Q 300 160 310 220 Q 320 280 300 320 Q 280 345 240 352 Q 270 330 280 290 Q 290 240 280 190 Q 265 140 240 120 Q 225 108 200 105 Z" fill="#9B3005" opacity="0.7"/>
+  <!-- Neck -->
+  <path d="M 155 95 Q 160 70 180 60 Q 200 55 220 60 Q 240 70 245 95 Q 230 105 200 105 Q 170 105 155 95 Z" fill="#C1440E"/>
+  <!-- Rim -->
+  <ellipse cx="200" cy="90" rx="48" ry="14" fill="#D4520F"/>
+  <!-- Inner rim shadow -->
+  <ellipse cx="200" cy="90" rx="35" ry="8" fill="#8B2500" opacity="0.6"/>
+  <!-- Left handle -->
+  <path d="M 100 200 Q 60 200 55 230 Q 50 260 95 265 Q 100 250 100 240 Q 75 235 78 218 Q 80 205 100 210 Z" fill="#B53D0E"/>
+  <!-- Right handle -->
+  <path d="M 300 200 Q 340 200 345 230 Q 350 260 305 265 Q 300 250 300 240 Q 325 235 322 218 Q 320 205 300 210 Z" fill="#B53D0E"/>
+  <!-- Highlight -->
+  <ellipse cx="165" cy="185" rx="18" ry="30" fill="white" opacity="0.12"/>
+</svg>

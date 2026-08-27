@@ -1,0 +1,38 @@
+{
+  "name": "100pots-experience",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:core && tsc -b && vite build",
+    "build:core": "esbuild src/standalone/index.ts --bundle --format=iife --global-name=ShatterCore --outfile=src/assets/shatterCoreBundle.js --minify",
+    "lint": "oxlint",
+    "test:determinism": "esbuild scripts/determinism-check.ts --bundle --platform=node --format=esm --outfile=/tmp/svg-shatter-determinism.mjs && node /tmp/svg-shatter-determinism.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "@types/matter-js": "^0.20.2",
+    "d3-delaunay": "^6.0.4",
+    "jszip": "^3.10.1",
+    "lucide-react": "^1.31.0",
+    "matter-js": "^0.20.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "autoprefixer": "^10.5.4",
+    "esbuild": "^0.28.2",
+    "oxlint": "^1.75.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}
